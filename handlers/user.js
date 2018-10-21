@@ -6,9 +6,22 @@ module.exports = (socket, conn, users, sendSysMsg) => {
 
   function updateUsers() {
     var cleanedUsers = {};
-    cleanedUsers["!SYSTEM42"] = {nick: "SYSTEM42", color: "#0f0"};
-    for (var user in users) {
-      cleanedUsers[user] = {nick: users[user].nick, color: users[user].color};
+    var mods = Object.keys(users).filter(e => users[e].god);
+    var notmods = Object.keys(users).filter(e => !users[e].god);
+    cleanedUsers["!!!00_SYSTEM42"] = {nick: "SYSTEM42", color: "#0f0"};
+    if (mods.length > 0) {
+      cleanedUsers["!!!01_FILLER1"] = {nick: "<b></b>", color: "#000"};
+      cleanedUsers["!!!02_MODTAG"] = {nick: "<i style=\"opacity: 0.7;\">ADMINS - " + mods.length + "</i>", color: "#fff"};
+      for (var mod in mods) {
+        cleanedUsers["!!" + mods[mod]] = {nick: users[mods[mod]].nick, color: users[mods[mod]].color};
+      }
+    }
+    if (notmods.length > 0) {
+      cleanedUsers["!!00_FILLER2"] = {nick: "<b></b>", color: "#000"};
+      cleanedUsers["!!01_USRTAG"] = {nick: "<i style=\"opacity: 0.7;\">ONLINE - " + notmods.length + "</i>", color: "#fff"};
+      for (var user in notmods) {
+        cleanedUsers[notmods[user]] = {nick: users[notmods[user]].nick, color: users[notmods[user]].color};
+      }
     }
     socket.emit("update users", cleanedUsers);
   }

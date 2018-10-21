@@ -6,7 +6,6 @@ const db = low(adapter);
 
 module.exports = (socket, conn, users, sendSysMsg) => {
   function banKick(id, baninfo) {
-    console.log(socket.sockets.connected);
     function msg(text) {
       socket.to(id).emit("message", {
         date: Date.now(),

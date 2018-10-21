@@ -24,7 +24,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
         }
         if (message.startsWith("?!ban ") && users[conn.id].god) {
           if (!users[args[1]]) return sendSysMsg(args[1] + " isn't a valid id.");
-          banh.ban(args[1], users[args[1]].ip, args.slice(3).join(" "), parseInt(args[2] * 1000));
+          banh.ban(args[1], users[args[1]].ip, args.slice(3).join(" "), parseInt(args[2]) * 1000);
           sendSysMsg("Banned " + users[args[1]].nick + ".");
           return;
         }
