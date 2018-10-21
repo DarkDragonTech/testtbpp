@@ -39,7 +39,7 @@ process.on("SIGINT", () => {
     msg: "The server is stopping!"
   });
   socket.close();
-  log("Stopped sever.");
+  log("Stopped server.");
   process.exit(0);
 });
 
