@@ -135,11 +135,23 @@ module.exports = (socket, conn, users, sendSysMsg) => {
           if (args.length > 2) {
             min = Number.isNaN(parseInt(args[2])) ? 1 : parseInt(args[2]);
           }
-          sendSysMsg(`${htmlname(users[conn.id])} <em>rolls a...</em>${Math.floor(Math.random() * (max - min + 1)) + min}<em>!</em>`);
+          conn.emit("message", {
+            date: Date.now(),
+            nick: "SYSTEM42",
+            color: "#0f0",
+            style: "",
+            msg: `${htmlname(users[conn.id])} <em>rolls a...</em>${Math.floor(Math.random() * (max - min + 1)) + min}<em>!</em>`
+          });
           return;
         }
         if (message.startsWith("?!me")) {
-          sendSysMsg(`${htmlname(users[conn.id])} <em>${he.encode(args.slice(1).join(" "))}</em>`);
+          conn.emit("message", {
+            date: Date.now(),
+            nick: "SYSTEM42",
+            color: "#0f0",
+            style: "",
+            msg: `${htmlname(users[conn.id])} <em>${he.encode(args.slice(1).join(" "))}</em>`
+          });
           return;
         }
         if (message.startsWith("/sin")) {
