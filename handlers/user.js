@@ -81,12 +81,12 @@ module.exports = (socket, conn, users, sendSysMsg) => {
       nick = (nick == "SYSTEM42" ? "gay retard" : he.encode(nick));
       usr(conn.id, (users[conn.id] ? users[conn.id].nick + " " : "") + "is now " + nick);
       if (users[conn.id]) {
-        socket.emit("user change nick", {nick: users[conn.id].nick, color: users[conn.id].color}, {nick: nick, color: color});
+        socket.emit("user change nick", {nick: users[conn.id].nick, color: users[conn.id].color}, {nick: nick, color: isColor(color) ? color : generate(nick)});
       } else {
-        socket.emit("user joined", {nick: nick, color: color});
+        socket.emit("user joined", {nick: nick, color: isColor(color) ? color : generate(nick)});
       }
       users[conn.id] = {
-        nick: typeof nick == "string" ? nick : "anonymous",
+        nick: nick,
         color: isColor(color) ? color : generate(nick),
         bot: style == "beepboop",
         ip: conn.handshake.headers["x-real-ip"] || conn.handshake.address,
