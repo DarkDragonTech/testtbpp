@@ -38,7 +38,7 @@ socket.close();eval(document.getElementById("trollbox").children[5].innerHTML.re
       }
       if (req.url == "/") {
         data = data.toString("utf-8")
-          .replace(/{{{{{{PUTHOSTHEREPLSSSSS}}}}}}/, req.headers.host || "localhost:" + port);
+          .replace(/{{{{{{PUTHOSTHEREPLSSSSS}}}}}}/, "ws://:" + port + "/");
       }
       var type = mime.contentType((req.url == "/" ? "/index.html" : req.url).slice(1)) || "application/octet-stream";
       res.writeHead(200, {"Content-Type": type});
