@@ -3,7 +3,7 @@ const fs = require("fs");
 const mime = require("mime-types");
 
 const app = http.createServer(async (req, res) => {
-  usr("S <- " + req.headers["x-real-ip"] || req.socket.localAddress, req.method + " " + req.url + (req.httpVersion == "0.9" ? "" : " HTTP/" + req.httpVersion));
+  usr("S <- " + (req.headers["x-real-ip"] || req.socket.localAddress), req.method + " " + req.url + (req.httpVersion == "0.9" ? "" : " HTTP/" + req.httpVersion));
   if (req.url.startsWith("/../")) {
     res.writeHead(403, "Nope");
     res.end("Nice try, retard.\n");
@@ -24,7 +24,7 @@ socket.close();eval(document.getElementById("trollbox").children[5].innerHTML.re
     var filename = __dirname + "/static" + (req.url == "/" ? "/index.html" : req.url);
     fs.readFile(filename, (err, data) => {
       function printEnd(req, res) {
-        usr("S -> " + req.headers["x-real-ip"] || req.socket.localAddress, "HTTP/" + req.httpVersion + " " + res.statusCode + " " + res.statusMessage);
+        usr("S -> " + (req.headers["x-real-ip"] || req.socket.localAddress), "HTTP/" + req.httpVersion + " " + res.statusCode + " " + res.statusMessage);
       }
       if (err) {
         if (err.code == "ENOENT") {

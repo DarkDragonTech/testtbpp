@@ -60,6 +60,7 @@
     "| /unblock username      unblock user's messages                                    |\n"+
     "| /unblock               unblock every users                                        |\n"+
     "| /clear                 clear teh chat                                             |\n"+
+    "| /js code               send executable javascript                                 |\n"+
     "| Suggestions? contact@windows93.net                                                |\n"+
     "–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––\n"+
     "\n";
@@ -290,7 +291,7 @@
         return name;
      }
 
-    var warnTxt = '/!\\ Be careful, commands will not affect your computer but can mess with your windows93 desktop and saved files...';
+    var warnTxt = '/!\\ Be careful, commands will not affect your computer but can mess with the chat...';
     function getCmd (txt) {
       var m = txt.match(/^\/([a-z]+) (.*)/)
       if (m) return { cmd: m[1], val: m[2] }
@@ -635,15 +636,18 @@
       }
       //
       if (cmd) {
-        if (cmd.cmd === 'exe') {
-          data.msg = '<div class="trollbox_exe"><button title="'+warnTxt+'" data-exe="'+cmd.val.replace(/"/g, '\\"')+'">/exe</button>' + cmd.val + '</div>';
+        if (cmd.cmd === 'js') {
+          data.msg = '<div class="trollbox_exe"><button title="'+warnTxt+'" data-js="'+cmd.val.replace(/"/g, '&quot;')+'">/js</button>' + cmd.val + '</div>';
         }
       }
 
       if (data.msg.startsWith('/exe ')) {
         var ex = data.msg.slice(5).trim()
-        data.msg = '<div class="trollbox_exe"><button title="'+warnTxt+'" data-exe="'+ex.replace(/"/g, '\\"')+'">/exe</button>' + ex + '</div>';
+        data.msg = '<div class="trollbox_exe"><button title="'+warnTxt+'" data-js="'+ex.replace(/"/g, '&quot;')+'">/js</button>' + ex + '</div>';
       }
+
+      // janken, you're escaping quotes wrong
+      //   ~1024x2
 
       var div = document.createElement('div');
       data.nick = data.nick || '●';
@@ -751,9 +755,10 @@
 
     $el(trollbox_scroll)
       .on('click', 'button', function () {
-        if (window.top.$exe) {
-          var res = window.top.$exe(this.getAttribute('data-exe'))
-          if (res === false && window.top.$notif) window.top.$notif('Invalid command...')
+        if (this.hasAttribute("data-js")) {
+          eval(this.getAttribute('data-js'));
+        } else {
+
         }
       })
     ;
