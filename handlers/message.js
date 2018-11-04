@@ -135,7 +135,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
           if (args.length > 2) {
             min = Number.isNaN(parseInt(args[2])) ? 1 : parseInt(args[2]);
           }
-          conn.emit("message", {
+          socket.emit("message", {
             date: Date.now(),
             nick: "SYSTEM42",
             color: "#0f0",
@@ -145,7 +145,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
           return;
         }
         if (message.startsWith("?!me")) {
-          conn.emit("message", {
+          socket.emit("message", {
             date: Date.now(),
             nick: "SYSTEM42",
             color: "#0f0",
