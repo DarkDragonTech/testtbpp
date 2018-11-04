@@ -1,6 +1,5 @@
 Welcome to trollbox++! Type ?!help for help.
 
-PROTIP: You can connect to trollbox++ with the offical client by pasting the contents of
-        {{{{{GIBEINJECTPLS}}}}} into the devtools console at http://windows93.net/trollbox/.
-        You can also connect to trollbox++ with custom clients by entering {{{{{GIBEHOSTPLS}}}}}
-        as the URL.
+To connect to trollbox++ with custom clients, use this url: {{{{{GIBEHOSTPLS}}}}}
+
+Trollbox++'s source code is available here: http://github.com/1024x2/tbpp
