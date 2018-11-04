@@ -12,6 +12,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
   return {
     handleMessage: (message) => {
       try {
+        if (typeof message != "string") return;
         var args = message.split(" ");
         if (!users[conn.id]) {
           sendSysMsg("I seem to have forgotten your name.");

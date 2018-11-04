@@ -1,5 +1,6 @@
 const fs = require("fs");
 const motd = fs.readFileSync(__dirname + "/../motd.txt", "utf-8").split("\n");
+const generate = require("string-to-color");
 
 module.exports = (socket, conn, users, sendSysMsg) => {
   var banh = require("./ban.js")(socket, conn, users, sendSysMsg);
@@ -54,7 +55,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
     cleanUpDeadConnections,
     updateUsers,
     handleConnection: () => {
-      if (conn.handshake.headers["x-real-ip"] && config.proxy.trustedonly && !(config.proxy.trusted || []).includes(conn.handshake.address)) {
+      if (conn.handshake.headers["x-real-ip"] && config.proxy.trustedonly && !((config.proxy.trusted || []).includes(conn.handshake.address))) {
         usr(conn.id, conn.handshake.address + " tried to connect as " + conn.handshake.headers["x-real-ip"] + ", but isn't trusted.");
         sendSysMsg("This proxy server is not a trusted proxy server. If you are using a proxy, please disable it.");
         return conn.disconnect();
@@ -82,8 +83,8 @@ module.exports = (socket, conn, users, sendSysMsg) => {
         socket.emit("user joined", {nick: nick, color: color});
       }
       users[conn.id] = {
-        nick: (nick || "anonymous"),
-        color: (color || "#fff"),
+        nick: typeof nick == "string" ? nick : "anonymous",
+        color: typeof color == "string" ? color : generate(nick),
         bot: style == "beepboop",
         ip: conn.handshake.headers["x-real-ip"] || conn.handshake.address,
         god: password == config.tbpp.adminpass
