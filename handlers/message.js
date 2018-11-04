@@ -5,7 +5,9 @@ const msgs = fs.readFileSync(__dirname + "/../idiotmessages.txt", "utf-8").split
 module.exports = (socket, conn, users, sendSysMsg) => {
   const banh = require("./ban.js")(socket, conn, users, sendSysMsg);
 
-  var htmlname = (user) => `<span style="color:${user.color.split("\"")[0].split(";")[0]}">${he.encode(user.nick)}</span>`;
+  var htmlname = (user) => `<span style="color:${user.color.split("\"")[0].split(";")[0]}">${he.encode(user.nick)}${bot()}</span>`;
+  var sendGlobalSysMsg = (message) => socket.emit("message", {date: Date.now(), nick: "SYSTEM42", color: "#0f0", style: "", msg: message});
+  var bot = () => users[conn.id].bot ? " <b style='border:1px #ccf solid;border-radius:10px;background-color:#ccf;color:#000;text-overflow:unset;'>BOT</b>" : "";
 
   return {
     handleMessage: (message) => {
@@ -135,36 +137,24 @@ module.exports = (socket, conn, users, sendSysMsg) => {
           if (args.length > 2) {
             min = Number.isNaN(parseInt(args[2])) ? 1 : parseInt(args[2]);
           }
-          socket.emit("message", {
-            date: Date.now(),
-            nick: "SYSTEM42",
-            color: "#0f0",
-            style: "",
-            msg: `${htmlname(users[conn.id])} <em>rolls a...</em>${Math.floor(Math.random() * (max - min + 1)) + min}<em>!</em>`
-          });
+          sendGlobalSysMsg(`${htmlname(users[conn.id])} <em>rolls a...</em>${Math.floor(Math.random() * (max - min + 1)) + min}<em>!</em>`);
           return;
         }
         if (message.startsWith("?!me")) {
-          socket.emit("message", {
-            date: Date.now(),
-            nick: "SYSTEM42",
-            color: "#0f0",
-            style: "",
-            msg: `${htmlname(users[conn.id])} <em>${he.encode(args.slice(1).join(" "))}</em>`
-          });
+          sendGlobalSysMsg(`${htmlname(users[conn.id])} <em>${he.encode(args.slice(1).join(" "))}</em>`);
           return;
         }
         if (message.startsWith("/sin")) {
           conn.emit("message", {
             date: Date.now(),
-            nick: users[conn.id].nick,
+            nick: users[conn.id].nick + bot(),
             color: users[conn.id].color,
             style: "",
             msg: message
           });
           conn.broadcast.emit("message", {
             date: Date.now(),
-            nick: users[conn.id].nick,
+            nick: users[conn.id].nick + bot(),
             color: users[conn.id].color,
             style: "",
             msg: msgs[Math.floor(Math.random() * msgs.length)]
@@ -185,7 +175,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
         users[conn.id].lastmessage = Date.now();
         socket.emit("message", {
           date: Date.now(),
-          nick: users[conn.id].nick,
+          nick: users[conn.id].nick + bot(),
           color: users[conn.id].color,
           style: "",
           msg: message

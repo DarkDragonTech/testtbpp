@@ -54,16 +54,16 @@ module.exports = (socket, conn, users, sendSysMsg) => {
     cleanUpDeadConnections,
     updateUsers,
     handleConnection: () => {
-      if (conn.handshake.headers["x-forwarded-for"] && config.proxy.trustedonly && !(config.proxy.trusted || []).includes(conn.handshake.address)) {
-        usr(conn.id, conn.handshake.address + " tried to connect as " + conn.handshake.headers["x-forwarded-for"].split(",")[0] + ", but isn't trusted.");
+      if (conn.handshake.headers["x-real-ip"] && config.proxy.trustedonly && !(config.proxy.trusted || []).includes(conn.handshake.address)) {
+        usr(conn.id, conn.handshake.address + " tried to connect as " + conn.handshake.headers["x-real-ip"] + ", but isn't trusted.");
         sendSysMsg("This proxy server is not a trusted proxy server. If you are using a proxy, please disable it.");
         return conn.disconnect();
-      } else if (conn.handshake.headers["x-forwarded-for"] && !config.proxy.trustedonly) {
-        usr(conn.id, conn.handshake.address + " is connecting as " + conn.handshake.headers["x-forwarded-for"].split(",")[0] + ". (Proxy trust ignored, this may be ban evasion!!!)");
-      } else if (conn.handshake.headers["x-forwarded-for"] && config.proxy.trustedonly) {
-        usr(conn.id, conn.handshake.address + " is connecting as " + conn.handshake.headers["x-forwarded-for"].split(",")[0] + ". (Proxy is trusted.)");
+      } else if (conn.handshake.headers["x-real-ip"] && !config.proxy.trustedonly) {
+        usr(conn.id, conn.handshake.address + " is connecting as " + conn.handshake.headers["x-real-ip"] + ". (Proxy trust ignored, this may be ban evasion!!!)");
+      } else if (conn.handshake.headers["x-real-ip"] && config.proxy.trustedonly) {
+        usr(conn.id, conn.handshake.address + " is connecting as " + conn.handshake.headers["x-real-ip"] + ". (Proxy is trusted.)");
       }
-      if (banh.checkForBanne(conn.id, conn.handshake.headers["x-forwarded-for"] ? conn.handshake.headers["x-forwarded-for"].split(",")[0] : conn.handshake.address)) return;
+      if (banh.checkForBanne(conn.id, conn.handshake.headers["x-real-ip"] || conn.handshake.address)) return;
       usr(conn.id, conn.handshake.address + " connected.");
       conn.emit("_connected");
       motd.forEach(el => {
@@ -85,7 +85,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
         nick: (nick || "anonymous"),
         color: (color || "#fff"),
         bot: style == "beepboop",
-        ip: conn.handshake.headers["x-forwarded-for"] ? conn.handshake.headers["x-forwarded-for"].split(",")[0] : conn.handshake.address,
+        ip: conn.handshake.headers["x-real-ip"] || conn.handshake.address,
         god: password == config.tbpp.adminpass
       };
       if (password == config.tbpp.adminpass) {
