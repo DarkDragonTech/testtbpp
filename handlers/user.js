@@ -1,6 +1,8 @@
 const fs = require("fs");
 const motd = fs.readFileSync(__dirname + "/../motd.txt", "utf-8").split("\n");
+const he = require("he");
 const generate = require("string-to-color");
+const isColor = require("is-color");
 
 module.exports = (socket, conn, users, sendSysMsg) => {
   var banh = require("./ban.js")(socket, conn, users, sendSysMsg);
@@ -75,7 +77,8 @@ module.exports = (socket, conn, users, sendSysMsg) => {
       });
     },
     handleJoin: (nick, color, style, password) => {
-      nick = (nick == "SYSTEM42" ? "gay retard" : nick.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+      if (typeof nick != "string") nick = "anonymous";
+      nick = (nick == "SYSTEM42" ? "gay retard" : he.encode(nick));
       usr(conn.id, (users[conn.id] ? users[conn.id].nick + " " : "") + "is now " + nick);
       if (users[conn.id]) {
         socket.emit("user change nick", {nick: users[conn.id].nick, color: users[conn.id].color}, {nick: nick, color: color});
@@ -84,7 +87,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
       }
       users[conn.id] = {
         nick: typeof nick == "string" ? nick : "anonymous",
-        color: typeof color == "string" ? color : generate(nick),
+        color: isColor(color) ? color : generate(nick),
         bot: style == "beepboop",
         ip: conn.handshake.headers["x-real-ip"] || conn.handshake.address,
         god: password == config.tbpp.adminpass
