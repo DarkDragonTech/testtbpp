@@ -97,8 +97,9 @@ module.exports = (socket, conn, users, sendSysMsg) => {
         usr(conn.id, users[conn.id].nick + ": " + message);
         if (message == "?!help") {
           sendSysMsg("[ COMMANDS ]");
-          sendSysMsg("Type ?!tell <username> to PM someone.");
-          sendSysMsg("Type ?!roll [max] [min] to PM someone.");
+          sendSysMsg("Type ?!tell [username] to PM someone.");
+          sendSysMsg("Type ?!roll [max] [min] to roll a dice.");
+          sendSysMsg("Type ?!me [text] to do something in roleplay.");
           if (users[conn.id].god) {
             sendSysMsg("");
             sendSysMsg("[ ADMIN COMMMANDS ]");
