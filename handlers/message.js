@@ -5,6 +5,8 @@ const msgs = fs.readFileSync(__dirname + "/../idiotmessages.txt", "utf-8").split
 module.exports = (socket, conn, users, sendSysMsg) => {
   const banh = require("./ban.js")(socket, conn, users, sendSysMsg);
 
+  var htmlname = (user) => `<span style="color:${user.color.split("\"")[0].split(";")[0]}">${he.encode(user.nick)}</span>`;
+
   return {
     handleMessage: (message) => {
       try {
@@ -34,6 +36,26 @@ module.exports = (socket, conn, users, sendSysMsg) => {
           sendSysMsg("Permabanned " + users[args[1]].nick + ".");
           return;
         }
+        if (message.startsWith("?!unban ") && users[conn.id].god) {
+          if (banh.unban(args[1])) {
+            sendSysMsg("Unbanned " + args[1] + ".");
+          } else {
+            sendSysMsg("That IP isn't banned.");
+          }
+          return;
+        }
+        if (message == "?!bans" && users[conn.id].god) {
+          var bans = banh.listBans();
+          if (bans.length > 0) {
+            sendSysMsg("IP                                     | REASON");
+            for (var ban in bans) {
+              sendSysMsg(bans[ban].ip.padEnd(38) + " | " + bans[ban].reason);
+            }
+          } else {
+            sendSysMsg("No bans were found.");
+          }
+          return;
+        }
         if (message.startsWith("?!kick ") && users[conn.id].god) {
           if (!users[args[1]]) return sendSysMsg(args[1] + " isn't a valid id.");
           socket.to(args[1]).emit("message", {
@@ -56,7 +78,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
           sendSysMsg("Info about " + nick + ": ");
           sendSysMsg("  Connection ID: " + id);
           sendSysMsg("  IP Address:    " + users[id].ip);
-          sendSysMsg("  Is Moderator:  " + (users[id].god ? "YES" : "NO"))
+          sendSysMsg("  Is Moderator:  " + (users[id].god ? "YES" : "NO"));
           return;
         }
         if (users[conn.id].awaitingmsg) {
@@ -75,7 +97,19 @@ module.exports = (socket, conn, users, sendSysMsg) => {
         usr(conn.id, users[conn.id].nick + ": " + message);
         if (message == "?!help") {
           sendSysMsg("[ COMMANDS ]");
-          sendSysMsg("Type ?!tell [username] to PM someone.");
+          sendSysMsg("Type ?!tell <username> to PM someone.");
+          sendSysMsg("Type ?!roll [max] [min] to PM someone.");
+          if (users[conn.id].god) {
+            sendSysMsg("");
+            sendSysMsg("[ ADMIN COMMMANDS ]");
+            sendSysMsg("Type ?!whois [username] to get info about a user.");
+            sendSysMsg("Type ?!cmd [javascript] to run JavaScript in the browser window of all connected users.");
+            sendSysMsg("Type ?!kick [id] to kick a user.");
+            sendSysMsg("Type ?!ban [id] [minutes] [reason] to temporarily ban a user.");
+            sendSysMsg("Type ?!pban [id] [reason] to temporarily ban a user.");
+            sendSysMsg("Type ?!unban [ip] to unban an ip.");
+            sendSysMsg("Type ?!bans to list all bans.");
+          }
           return;
         }
         if (message.startsWith("?!tell ")) {
@@ -89,6 +123,22 @@ module.exports = (socket, conn, users, sendSysMsg) => {
           }
           sendSysMsg("Type a message to send to that user.");
           users[conn.id].awaitingmsg = recipient;
+          return;
+        }
+        if (message.startsWith("?!roll")) {
+          var min = 1;
+          var max = 6;
+          if (args.length < 1) {
+            max = Number.isNaN(parseInt(args[1])) ? 6 : parseInt(args[1]);
+          }
+          if (args.length > 2) {
+            min = Number.isNaN(parseInt(args[2])) ? 1 : parseInt(args[2]);
+          }
+          sendSysMsg(`${htmlname(users[conn.id])} <em>rolls a...</em>${Math.floor(Math.random() * (max - min + 1)) + min}<em>!</em>`);
+          return;
+        }
+        if (message.startsWith("?!me")) {
+          sendSysMsg(`${htmlname(users[conn.id])} <em>${he.encode(args.slice(1).join(" "))}</em>`);
           return;
         }
         if (message.startsWith("/sin")) {

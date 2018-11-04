@@ -6,19 +6,31 @@ module.exports = (socket, conn, users, sendSysMsg) => {
 
   function updateUsers() {
     var cleanedUsers = {};
-    var mods = Object.keys(users).filter(e => users[e].god);
-    var notmods = Object.keys(users).filter(e => !users[e].god);
-    cleanedUsers["!!!00_SYSTEM42"] = {nick: "SYSTEM42", color: "#0f0"};
+    var mods = Object.keys(users).filter(e => users[e].god && !users[e].bot);
+    var bots = Object.keys(users).filter(e => users[e].bot);
+    var notmods = Object.keys(users).filter(e => !users[e].god && !users[e].bot);
+    cleanedUsers["!!!!00_SYSTEM42"] = {nick: "SYSTEM42", color: "#0f0"};
     if (mods.length > 0) {
-      cleanedUsers["!!!01_FILLER1"] = {nick: "<b></b>", color: "#000"};
-      cleanedUsers["!!!02_MODTAG"] = {nick: "<i style=\"opacity: 0.7;\">ADMINS - " + mods.length + "</i>", color: "#fff"};
+      cleanedUsers["!!!!01_FILLER"] = {nick: "<b></b>", color: "#000"};
+      cleanedUsers["!!!!02_MODTAG"] = {nick: "<i style=\"opacity: 0.7;\">ADMINS - " + mods.length + "</i>", color: "#fff"};
       for (var mod in mods) {
-        cleanedUsers["!!" + mods[mod]] = {nick: users[mods[mod]].nick, color: users[mods[mod]].color};
+        cleanedUsers["!!!" + mods[mod]] = {nick: users[mods[mod]].nick, color: users[mods[mod]].color};
+      }
+    }
+    if (bots.length > 0) {
+      cleanedUsers["!!!00_FILLER"] = {nick: "<b></b>", color: "#000"};
+      cleanedUsers["!!!01_USRTAG"] = {nick: "<i style=\"opacity: 0.7;\">BOTS - " + bots.length + "</i>", color: "#fff"};
+      for (var bot in bots) {
+        var botto = users[bots[bot]];
+        cleanedUsers["!!" + bots[bot]] = {
+          nick: botto.nick + " <b style='border:1px #ccf solid;border-radius:10px;background-color:#ccf;color:#000;text-overflow:unset;'>BOT</b>",
+          color: botto.color
+        };
       }
     }
     if (notmods.length > 0) {
-      cleanedUsers["!!00_FILLER2"] = {nick: "<b></b>", color: "#000"};
-      cleanedUsers["!!01_USRTAG"] = {nick: "<i style=\"opacity: 0.7;\">ONLINE - " + notmods.length + "</i>", color: "#fff"};
+      cleanedUsers["!00_FILLER2"] = {nick: "<b></b>", color: "#000"};
+      cleanedUsers["!01_USRTAG"] = {nick: "<i style=\"opacity: 0.7;\">ONLINE - " + notmods.length + "</i>", color: "#fff"};
       for (var user in notmods) {
         cleanedUsers[notmods[user]] = {nick: users[notmods[user]].nick, color: users[notmods[user]].color};
       }
@@ -30,7 +42,6 @@ module.exports = (socket, conn, users, sendSysMsg) => {
     socket.clients((err, clients) => {
       for (var user in users) {
         if (!clients.includes(user)) {
-          usr(user, "has disconnected");
           socket.emit("user left", {nick: users[user].nick, color: users[user].color});
           delete users[user];
         }
@@ -43,8 +54,17 @@ module.exports = (socket, conn, users, sendSysMsg) => {
     cleanUpDeadConnections,
     updateUsers,
     handleConnection: () => {
-      if (banh.checkForBanne(conn.id, conn.handshake.address)) return;
-      usr(conn.id, "connected.");
+      if (conn.handshake.headers["x-forwarded-for"] && config.proxy.trustedonly && !(config.proxy.trusted || []).includes(conn.handshake.address)) {
+        usr(conn.id, conn.handshake.address + " tried to connect as " + conn.handshake.headers["x-forwarded-for"].split(",")[0] + ", but isn't trusted.");
+        sendSysMsg("This proxy server is not a trusted proxy server. If you are using a proxy, please disable it.");
+        return conn.disconnect();
+      } else if (conn.handshake.headers["x-forwarded-for"] && !config.proxy.trustedonly) {
+        usr(conn.id, conn.handshake.address + " is connecting as " + conn.handshake.headers["x-forwarded-for"].split(",")[0] + ". (Proxy trust ignored, this may be ban evasion!!!)");
+      } else if (conn.handshake.headers["x-forwarded-for"] && config.proxy.trustedonly) {
+        usr(conn.id, conn.handshake.address + " is connecting as " + conn.handshake.headers["x-forwarded-for"].split(",")[0] + ". (Proxy is trusted.)");
+      }
+      if (banh.checkForBanne(conn.id, conn.handshake.headers["x-forwarded-for"] ? conn.handshake.headers["x-forwarded-for"].split(",")[0] : conn.handshake.address)) return;
+      usr(conn.id, conn.handshake.address + " connected.");
       conn.emit("_connected");
       motd.forEach(el => {
         sendSysMsg(
@@ -64,7 +84,8 @@ module.exports = (socket, conn, users, sendSysMsg) => {
       users[conn.id] = {
         nick: (nick || "anonymous"),
         color: (color || "#fff"),
-        ip: conn.handshake.address,
+        bot: style == "beepboop",
+        ip: conn.handshake.headers["x-forwarded-for"] ? conn.handshake.headers["x-forwarded-for"].split(",")[0] : conn.handshake.address,
         god: password == config.tbpp.adminpass
       };
       if (password == config.tbpp.adminpass) {

@@ -4,7 +4,7 @@ const FileSync = require("lowdb/adapters/FileSync");
 const adapter = new FileSync("bans.json");
 const db = low(adapter);
 
-module.exports = (socket, conn, users, sendSysMsg) => {
+module.exports = (socket, conn) => {
   function banKick(id, baninfo) {
     function msg(text) {
       socket.to(id).emit("message", {
@@ -15,7 +15,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
         msg: text
       });
     }
-    usr(conn.id, "is banned, kicking...");
+    usr(conn.id, conn.handshake.address + " is banned, kicking...");
     msg("You have been banned!");
     msg("");
     msg("Reason: " + baninfo.reason);
@@ -28,11 +28,31 @@ module.exports = (socket, conn, users, sendSysMsg) => {
     socket.sockets.connected[id].disconnect(true);
   }
 
+  function getBan(ip) {
+    return db.get("bans")
+      .find({ip: ip})
+      .value();
+  }
+
+  function listBans() {
+    return db.get("bans")
+      .value();
+  }
+
   function ban(id, ip, reason, expires) {
+    if (getBan(ip)) return false;
     db.get("bans")
-      .push({ip: ip, reason: reason, expires: expires ? Date.now() + expires : false})
+      .push({ip: ip, reason: reason, expires: expires ? Date.now() + (expires * 60000) : false})
       .write();
     checkForBanne(id, ip);
+  }
+
+  function unban(ip) {
+    if (!getBan(ip)) return false;
+    db.get("bans")
+      .remove({ip: ip})
+      .write();
+    return true;
   }
 
   function checkForBanne(id, ip) {
@@ -41,6 +61,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
       .value();
     if (isbanne) {
       if (isbanne.expires && Date.now() > isbanne.expires) {
+
         return false;
       }
       banKick(id, isbanne);
@@ -53,7 +74,10 @@ module.exports = (socket, conn, users, sendSysMsg) => {
 
   return {
     banKick: banKick,
+    getBan: getBan,
+    listBans: listBans,
     ban: ban,
-    checkForBanne: checkForBanne
+    unban: unban,
+    checkForBanne: checkForBanne,
   };
 };

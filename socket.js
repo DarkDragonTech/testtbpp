@@ -35,6 +35,7 @@ module.exports = (app) => {
     });
 
     conn.on("disconnect", () => {
+      usr(conn.id, "disconnected.");
       usrh.cleanUpDeadConnections();
     });
 

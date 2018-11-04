@@ -38,9 +38,10 @@ process.on("SIGINT", () => {
     style: "",
     msg: "The server is stopping!"
   });
-  socket.close();
-  log("Stopped sever.");
-  process.exit(0);
+  socket.close(() => {
+    log("Stopped server.");
+    process.exit(0);
+  });
 });
 
 app.listen(port, () => log("Listening on port " + port + " (http://localhost:" + port + "/)"));
