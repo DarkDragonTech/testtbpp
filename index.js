@@ -17,6 +17,7 @@ var log = global.log = (text) => {
 log(`Starting tbpp ${version}...`);
 const app = require("./http.js");
 const socket = require("./socket.js")(app);
+if(config.https.enabled === true) log(`Running with HTTPS enabled.`); else log(`Running without HTTPS enabled.`);
 
 process.on("uncaughtException", (err) => {
   log("==== FATAL ERROR! ====");
@@ -42,5 +43,6 @@ process.on("SIGINT", () => {
   log("Stopped server.");
   process.exit(0);
 });
-
-app.listen(port, () => log("Listening on port " + port + " (http://localhost:" + port + "/)"));
+let ptcl = "";
+if(config.https.enabled === true) ptcl = "https://"; else ptcl = "http://"
+app.listen(port, () => log("Listening on port " + port + ` (${ptcl}localhost:` + port + "/)"));
