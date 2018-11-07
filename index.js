@@ -13,7 +13,7 @@ var usr = global.usr = (user, text) => {
 };
 
 var log = global.log = (text) => {
-  usr("=======SERVER=======", text);
+  usr("     = SERVER =     ", text);
 };
 
 var stop = global.stop = () => {

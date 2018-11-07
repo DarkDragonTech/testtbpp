@@ -4,10 +4,14 @@ const fs = require("fs");
 const mime = require("mime-types");
 
 const handler = async (req, res) => {
-  usr("S <- " + (req.headers["x-real-ip"] || req.socket.localAddress), req.method + " " + req.url + (req.httpVersion == "0.9" ? "" : " HTTP/" + req.httpVersion));
+  usr("S <" + (req.headers["x-real-ip"] || req.socket.localAddress).padStart(17), req.method + " " + req.url + (req.httpVersion == "0.9" ? "" : " HTTP/" + req.httpVersion));
+  function printEnd() {
+    usr("S >" + (req.headers["x-real-ip"] || req.socket.localAddress).padStart(17), "HTTP/" + req.httpVersion + " " + res.statusCode + " " + res.statusMessage);
+  }
   if (req.url.startsWith("/../")) {
     res.writeHead(403, "Nope");
     res.end("Nice try, retard.\n");
+    printEnd();
   } else if (req.url == "/inject.js") {
     res.writeHead(200, {"Content-Type": "application/javascript"});
     res.end(`/*
@@ -21,12 +25,10 @@ const handler = async (req, res) => {
  * 4. hit enter
  */
 socket.close();eval(document.getElementById("trollbox").children[5].innerHTML.replace("var socket = io('//www.windows93.net:8081');", "var socket = io('ws://${req.headers.host || "localhost:" + port}');"));`);
+    printEnd();
   } else {
     var filename = __dirname + "/static" + (req.url == "/" ? "/index.html" : req.url);
     fs.readFile(filename, (err, data) => {
-      function printEnd() {
-        usr("S -> " + (req.headers["x-real-ip"] || req.socket.localAddress), "HTTP/" + req.httpVersion + " " + res.statusCode + " " + res.statusMessage);
-      }
       if (err) {
         if (err.code == "ENOENT") {
           res.writeHead(404);
