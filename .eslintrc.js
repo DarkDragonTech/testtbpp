@@ -31,6 +31,8 @@ module.exports = {
       "log": () => {},
       "port": 1337,
       "config": {},
-      "version": ""
+      "version": "",
+      "stop": () => {},
+      "rl": {}
     }
 };
