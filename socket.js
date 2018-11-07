@@ -1,9 +1,32 @@
 const io = require("socket.io");
-var socket;
+const http = require("http");
+const https = require("https");
+const fs = require("fs");
 var users = [];
+var nopehandler = (req, res) => {
+  res.writeHead(200, {"Content-Type": "text/plain"});
+  res.end("no");
+};
 
 module.exports = (app) => {
-  socket = io(app);
+  var socket;
+
+  if (config.webclient.port == "same" && config.webclient.enabled) {
+    socket = io(app);
+  } else {
+    var noapp;
+    if (config.webclient.usehttps) {
+      const credentials = {
+        key: fs.readFileSync(config.https.private_key, "utf8"),
+        cert: fs.readFileSync(config.https.certificate, "utf8")
+      };
+      noapp = https.createServer(credentials, nopehandler);
+    } else {
+      noapp = http.createServer(nopehandler);
+    }
+    noapp.listen(port);
+    socket = io(noapp);
+  }
 
   socket.on("connection", (conn) => {
     function sendSysMsg(text) {

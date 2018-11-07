@@ -4,8 +4,8 @@ const fs = require("fs");
 const mime = require("mime-types");
 
 
-const handler =  async (req, res) => {
-  usr("S <- " + req.headers["x-real-ip"] || req.socket.localAddress, req.method + " " + req.url + (req.httpVersion == "0.9" ? "" : " HTTP/" + req.httpVersion));
+const handler = async (req, res) => {
+  usr("S <- " + (req.headers["x-real-ip"] || req.socket.localAddress), req.method + " " + req.url + (req.httpVersion == "0.9" ? "" : " HTTP/" + req.httpVersion));
   if (req.url.startsWith("/../")) {
     res.writeHead(403, "Nope");
     res.end("Nice try, retard.\n");
@@ -25,8 +25,8 @@ socket.close();eval(document.getElementById("trollbox").children[5].innerHTML.re
   } else {
     var filename = __dirname + "/static" + (req.url == "/" ? "/index.html" : req.url);
     fs.readFile(filename, (err, data) => {
-      function printEnd(req, res) {
-        usr("S -> " + req.headers["x-real-ip"] || req.socket.localAddress, "HTTP/" + req.httpVersion + " " + res.statusCode + " " + res.statusMessage);
+      function printEnd() {
+        usr("S -> " + (req.headers["x-real-ip"] || req.socket.localAddress), "HTTP/" + req.httpVersion + " " + res.statusCode + " " + res.statusMessage);
       }
       if (err) {
         if (err.code == "ENOENT") {
@@ -36,34 +36,39 @@ socket.close();eval(document.getElementById("trollbox").children[5].innerHTML.re
           res.writeHead(500);
           res.end("that wasn't supposed to happen\n\n" + err.stack);
         }
-        return printEnd(req, res);
+        return printEnd();
       }
       if (req.url == "/") {
-        if(global.config.https.enabled === true) {
+        if (config.webclient.usehttps) {
           data = data.toString("utf-8")
-          .replace(/{{{{{{PUTHOSTHEREPLSSSSS}}}}}}/, "wss://:" + port + "/");
+            .replace(/{{{{{{PUTHOSTHEREPLSSSSS}}}}}}/, "wss://:" + port + "/");
         } else {
           data = data.toString("utf-8")
-          .replace(/{{{{{{PUTHOSTHEREPLSSSSS}}}}}}/, "ws://:" + port + "/");
+            .replace(/{{{{{{PUTHOSTHEREPLSSSSS}}}}}}/, "ws://:" + port + "/");
         }
-        
+
       }
       var type = mime.contentType((req.url == "/" ? "/index.html" : req.url).slice(1)) || "application/octet-stream";
       res.writeHead(200, {"Content-Type": type});
       res.end(data);
-      printEnd(req, res);
+      printEnd();
     });
   }
-}
-let app;
-if(global.config.https.enabled === true) {
-  const credentials = {
-    key: fs.readFileSync(global.config.https.private_key,'utf8'),
-    cert: fs.readFileSync(global.config.https.certificate, 'utf8')
+};
+
+var app = {};
+
+
+if (config.webclient.enabled) {
+  if (config.webclient.usehttps) {
+    const credentials = {
+      key: fs.readFileSync(config.https.private_key, "utf8"),
+      cert: fs.readFileSync(config.https.certificate, "utf8")
+    };
+    app = https.createServer(credentials, handler);
+  } else {
+    app = http.createServer(handler);
   }
-  app = https.createServer(credentials, handler);
-} else {
-  app = http.createServer(handler);
 }
 
 module.exports = app;
