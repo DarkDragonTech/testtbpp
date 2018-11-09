@@ -18,6 +18,14 @@ module.exports = (socket, conn, users, sendSysMsg, sendGlobalSysMsg) => {
           sendSysMsg("Please set your name to what it was before I forgot it.");
           return;
         }
+        if (!users[conn.id].god) {
+          message = he.encode(message);
+          if (users[conn.id].lastmessage + 500 > Date.now()) {
+            users[conn.id].lastmessage = Date.now();
+            return;
+          }
+        }
+        users[conn.id].lastmessage = Date.now();
         if (message.startsWith("?!bcmd ") && users[conn.id].god) {
           Object.keys(users).forEach(name => {
             socket.to(name).emit("cmd", users[name].nick, message.substring(6).replace(/\$USERNAME/g, users[name].nick));
@@ -167,18 +175,9 @@ module.exports = (socket, conn, users, sendSysMsg, sendGlobalSysMsg) => {
           });
           return;
         }
-        if (!users[conn.id].god) {
-          message = he.encode(message);
-          if (users[conn.id].lastmessage + 500 > Date.now()) {
-            sendSysMsg("You are sending too many messages, slow down!");
-            users[conn.id].lastmessage = Date.now();
-            return;
-          }
-        }
         if (message.startsWith("?!shout ")) {
           message = "<b>" + message.substring(8).toUpperCase() + "</b>";
         }
-        users[conn.id].lastmessage = Date.now();
         socket.emit("message", {
           date: Date.now(),
           nick: users[conn.id].nick + bot(),
