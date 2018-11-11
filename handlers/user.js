@@ -94,6 +94,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
       };
       if (password == config.tbpp.adminpass) {
         usr(conn.id, "DEGREELESSNESS MODE ON");
+        sendSysMsg("DEGREELESSNESS MODE ON");
       }
       cleanUpDeadConnections();
     }
