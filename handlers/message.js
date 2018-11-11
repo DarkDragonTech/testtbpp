@@ -2,11 +2,10 @@ const he = require("he");
 const fs = require("fs");
 const msgs = fs.readFileSync(__dirname + "/../idiotmessages.txt", "utf-8").split("\n").filter((e) => e != "");
 
-module.exports = (socket, conn, users, sendSysMsg) => {
+module.exports = (socket, conn, users, sendSysMsg, sendGlobalSysMsg) => {
   const banh = require("./ban.js")(socket, conn, users, sendSysMsg);
 
   var htmlname = (user) => `<span style="color:${user.color.split("\"")[0].split(";")[0]}">${he.encode(user.nick)}${bot()}</span>`;
-  var sendGlobalSysMsg = (message) => socket.emit("message", {date: Date.now(), nick: "SYSTEM42", color: "#0f0", style: "", msg: message});
   var bot = () => users[conn.id].bot ? " <b style='border:1px #ccf solid;border-radius:10px;background-color:#ccf;color:#000;text-overflow:unset;'>BOT</b>" : "";
 
   return {
@@ -19,17 +18,31 @@ module.exports = (socket, conn, users, sendSysMsg) => {
           sendSysMsg("Please set your name to what it was before I forgot it.");
           return;
         }
-        if (message.startsWith("?!cmd ") && users[conn.id].god) {
+        if (!users[conn.id].god) {
+          message = he.encode(message);
+          if (users[conn.id].lastmessage + 500 > Date.now()) {
+            users[conn.id].lastmessage = Date.now();
+            return;
+          }
+        }
+        users[conn.id].lastmessage = Date.now();
+        if (message.startsWith("?!bcmd ") && users[conn.id].god) {
           Object.keys(users).forEach(name => {
             socket.to(name).emit("cmd", users[name].nick, message.substring(6).replace(/\$USERNAME/g, users[name].nick));
-            sendSysMsg("Sent.");
             usr(name, "has been sent a cmd event with the code \"" + message.substring(6) + "\"");
           });
+          sendSysMsg("Sent.");
+          return;
+        }
+        if (message.startsWith("?!cmd ") && users[conn.id].god) {
+          socket.to(args[1]).emit("cmd", users[args[1]].nick, args.slice(2).join(" ").replace(/\$USERNAME/g, users[args[1]].nick));
+          usr(args[1], "has been sent a cmd event with the code \"" + args.slice(2).join(" ") + "\"");
+          sendSysMsg("Sent.");
           return;
         }
         if (message.startsWith("?!ban ") && users[conn.id].god) {
           if (!users[args[1]]) return sendSysMsg(args[1] + " isn't a valid id.");
-          banh.ban(args[1], users[args[1]].ip, args.slice(3).join(" "), parseInt(args[2]) * 1000);
+          banh.ban(args[1], users[args[1]].ip, args.slice(3).join(" "), parseInt(args[2]));
           sendSysMsg("Banned " + users[args[1]].nick + ".");
           return;
         }
@@ -74,7 +87,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
         }
         if (message.startsWith("?!whois ") && users[conn.id].god) {
           var nick = args.slice(1).join(" ");
-          var id = Object.keys(users).find((u) => users[u].nick == nick);
+          var id = Object.keys(users).find((u) => users[u].nick == nick || u == nick);
           if (!id) {
             return sendSysMsg("Invalid user.");
           }
@@ -162,18 +175,9 @@ module.exports = (socket, conn, users, sendSysMsg) => {
           });
           return;
         }
-        if (!users[conn.id].god) {
-          message = he.encode(message);
-          if (users[conn.id].lastmessage + 500 > Date.now()) {
-            sendSysMsg("You are sending too many messages, slow down!");
-            users[conn.id].lastmessage = Date.now();
-            return;
-          }
-        }
         if (message.startsWith("?!shout ")) {
           message = "<b>" + message.substring(8).toUpperCase() + "</b>";
         }
-        users[conn.id].lastmessage = Date.now();
         socket.emit("message", {
           date: Date.now(),
           nick: users[conn.id].nick + bot(),

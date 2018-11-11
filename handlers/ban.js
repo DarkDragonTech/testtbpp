@@ -42,7 +42,7 @@ module.exports = (socket, conn) => {
   function ban(id, ip, reason, expires) {
     if (getBan(ip)) return false;
     db.get("bans")
-      .push({ip: ip, reason: reason, expires: expires ? Date.now() + (expires * 60000) : false})
+      .push({ip: ip, reason: reason, expires: expires ? Date.now() + (expires * 1000) : false})
       .write();
     checkForBanne(id, ip);
   }
