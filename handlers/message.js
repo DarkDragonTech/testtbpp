@@ -18,7 +18,7 @@ module.exports = (socket, conn, users, sendSysMsg, sendGlobalSysMsg) => {
           sendSysMsg("Please set your name to what it was before I forgot it.");
           return;
         }
-        if (!users[conn.id].god || !users[conn.id].bot) {
+        if (!users[conn.id].god) {
           message = he.encode(message);
           if (users[conn.id].lastmessage + 500 > Date.now()) {
             users[conn.id].lastmessage = Date.now();
