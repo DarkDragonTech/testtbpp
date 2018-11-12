@@ -1,7 +1,7 @@
 const he = require("he");
 const fs = require("fs");
 const msgs = fs.readFileSync(__dirname + "/../idiotmessages.txt", "utf-8").split("\n").filter((e) => e != "");
-
+const xss = require('xss')
 module.exports = (socket, conn, users, sendSysMsg, sendGlobalSysMsg) => {
   const banh = require("./ban.js")(socket, conn, users, sendSysMsg);
 
@@ -19,7 +19,12 @@ module.exports = (socket, conn, users, sendSysMsg, sendGlobalSysMsg) => {
           return;
         }
         if (!users[conn.id].god) {
-          message = he.encode(message);
+          if(users[conn.id].bot) {
+            message = xss(message);
+          } else {
+            message = he.encode(message);
+          }
+          
           if (users[conn.id].lastmessage + 500 > Date.now()) {
             users[conn.id].lastmessage = Date.now();
             return;
