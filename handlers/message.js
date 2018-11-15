@@ -1,12 +1,12 @@
 const he = require("he");
 const fs = require("fs");
 const msgs = fs.readFileSync(__dirname + "/../idiotmessages.txt", "utf-8").split("\n").filter((e) => e != "");
-
+const xss = require('xss')
 module.exports = (socket, conn, users, sendSysMsg, sendGlobalSysMsg) => {
   const banh = require("./ban.js")(socket, conn, users, sendSysMsg);
 
   var htmlname = (user) => `<span style="color:${user.color.split("\"")[0].split(";")[0]}">${he.encode(user.nick)}${bot()}</span>`;
-  var bot = () => users[conn.id].bot ? " <b style='border:1px #ccf solid;border-radius:10px;background-color:#ccf;color:#000;text-overflow:unset;'>BOT</b>" : "";
+  var bot = () => users[conn.id].bot ? " <b style='border:1px #ccf solid;border-radius:10px;background-color:#f4f142;color:#000;text-overflow:unset;'>BOT</b>" : "";
 
   return {
     handleMessage: (message) => {
@@ -19,7 +19,12 @@ module.exports = (socket, conn, users, sendSysMsg, sendGlobalSysMsg) => {
           return;
         }
         if (!users[conn.id].god) {
-          message = he.encode(message);
+          if(users[conn.id].bot) {
+            message = xss(message);
+          } else {
+            message = he.encode(message);
+          }
+          
           if (users[conn.id].lastmessage + 500 > Date.now()) {
             users[conn.id].lastmessage = Date.now();
             return;
@@ -123,7 +128,7 @@ module.exports = (socket, conn, users, sendSysMsg, sendGlobalSysMsg) => {
             sendSysMsg("Type ?!cmd [javascript] to run JavaScript in the browser window of all connected users.");
             sendSysMsg("Type ?!kick [id] to kick a user.");
             sendSysMsg("Type ?!ban [id] [minutes] [reason] to temporarily ban a user.");
-            sendSysMsg("Type ?!pban [id] [reason] to temporarily ban a user.");
+            sendSysMsg("Type ?!pban [id] [reason] to permanently ban a user.");
             sendSysMsg("Type ?!unban [ip] to unban an ip.");
             sendSysMsg("Type ?!bans to list all bans.");
           }
@@ -182,6 +187,8 @@ module.exports = (socket, conn, users, sendSysMsg, sendGlobalSysMsg) => {
           date: Date.now(),
           nick: users[conn.id].nick + bot(),
           color: users[conn.id].color,
+          god: users[conn.id].god,
+          bot: users[conn.id].bot,
           style: "",
           msg: message
         });

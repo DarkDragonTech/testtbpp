@@ -1,16 +1,16 @@
 {
   "name": "tbpp",
-  "version": "0.1.0",
-  "description": "Trolbox++",
+  "version": "0.1.2",
+  "description": "Trollbox++",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/1024x2/tbpp.git"
   },
-  "author": "1024x2",
+  "author": "1024x2, nekofurball",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/1024x2/tbpp/issues"
@@ -26,6 +26,7 @@
     "moment": "^2.22.2",
     "socket.io": "^2.1.1",
     "string-to-color": "^2.0.0",
-    "supports-color": "^5.5.0"
+    "supports-color": "^5.5.0",
+    "xss": "^1.0.3"
   }
 }
