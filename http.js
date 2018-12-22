@@ -4,9 +4,9 @@ const fs = require("fs");
 const mime = require("mime-types");
 
 const handler = async (req, res) => {
-  usr("S <" + (req.headers["x-real-ip"] || req.socket.localAddress).padStart(17), req.method + " " + req.url + (req.httpVersion == "0.9" ? "" : " HTTP/" + req.httpVersion));
+  usr("S <" + (req.headers["x-real-ip"] || req.socket.remoteAddress).padStart(17), req.method + " " + req.url + (req.httpVersion == "0.9" ? "" : " HTTP/" + req.httpVersion));
   function printEnd() {
-    usr("S >" + (req.headers["x-real-ip"] || req.socket.localAddress).padStart(17), "HTTP/" + req.httpVersion + " " + res.statusCode + " " + res.statusMessage);
+    usr("S >" + (req.headers["x-real-ip"] || req.socket.remoteAddress).padStart(17), "HTTP/" + req.httpVersion + " " + res.statusCode + " " + res.statusMessage);
   }
   if (req.url.startsWith("/../")) {
     res.writeHead(403, "Nope");
