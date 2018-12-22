@@ -1,12 +1,13 @@
 const he = require("he");
 const fs = require("fs");
 const msgs = fs.readFileSync(__dirname + "/../idiotmessages.txt", "utf-8").split("\n").filter((e) => e != "");
-const xss = require('xss')
+const xss = require("xss");
+
 module.exports = (socket, conn, users, sendSysMsg, sendGlobalSysMsg) => {
   const banh = require("./ban.js")(socket, conn, users, sendSysMsg);
 
   var htmlname = (user) => `<span style="color:${user.color.split("\"")[0].split(";")[0]}">${he.encode(user.nick)}${bot()}</span>`;
-  var bot = () => users[conn.id].bot ? " <b style='border:1px #ccf solid;border-radius:10px;background-color:#f4f142;color:#000;text-overflow:unset;'>BOT</b>" : "";
+  var bot = () => users[conn.id].bot ? " <b style='border:1px #f4f142 solid;border-radius:10px;background-color:#f4f142;color:#000;text-overflow:unset;'>BOT</b>" : "";
 
   return {
     handleMessage: (message) => {
@@ -24,7 +25,7 @@ module.exports = (socket, conn, users, sendSysMsg, sendGlobalSysMsg) => {
           } else {
             message = he.encode(message);
           }
-          
+
           if (users[conn.id].lastmessage + 500 > Date.now()) {
             users[conn.id].lastmessage = Date.now();
             return;

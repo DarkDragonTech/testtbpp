@@ -26,7 +26,7 @@ module.exports = (socket, conn, users, sendSysMsg) => {
       for (var bot in bots) {
         var botto = users[bots[bot]];
         cleanedUsers["!!" + bots[bot]] = {
-          nick: botto.nick + " <b style='border:1px #ccf solid;border-radius:10px;background-color:#ccf;color:#000;text-overflow:unset;'>BOT</b>",
+          nick: botto.nick + " <b style='border:1px #f4f142 solid;border-radius:10px;background-color:#f4f142;color:#000;text-overflow:unset;'>BOT</b>",
           color: botto.color
         };
       }
