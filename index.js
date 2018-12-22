@@ -9,7 +9,7 @@ var usr = global.usr = (user, text) => {
   process.stdout.write("\x1b[2K\r");
   user = user.substring(0, 20);
   console.log(("[" + user.padStart(20) + "]").green + " " + text);
-  if (global.rl) rl._refreshLine();
+  if (global.rl && global.config.cli) rl._refreshLine();
 };
 
 var log = global.log = (text) => {
