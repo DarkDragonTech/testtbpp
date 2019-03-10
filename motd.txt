@@ -1,5 +1,0 @@
-Welcome to trollbox++! Type ?!help for help.
-
-To connect to trollbox++ with custom clients, use this url: {{{{{GIBEHOSTPLS}}}}}
-
-Trollbox++'s source code is available here: http://github.com/1024x2/tbpp
