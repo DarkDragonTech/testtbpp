@@ -1,0 +1,24 @@
+{
+  "name": "tbpp",
+  "version": "2.0.0",
+  "description": "A custom trollbox server.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node startServer.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/1024x2/tbpp.git"
+  },
+  "author": "1024x2",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/1024x2/tbpp/issues"
+  },
+  "homepage": "https://gitlab.com/1024x2/tbpp#readme",
+  "dependencies": {
+    "he": "^1.2.0",
+    "socket.io": "^2.2.0"
+  },
+  "devDependencies": {}
+}
