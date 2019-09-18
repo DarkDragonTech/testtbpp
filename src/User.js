@@ -11,6 +11,14 @@ class User {
   isGod() {
     return this.password == socket.server.config.password;
   }
+
+  getSafeObject() {
+    return {
+      nick: this.nick,
+      color: this.color,
+      style: this.style
+    }
+  }
 }
 
 module.exports = User;

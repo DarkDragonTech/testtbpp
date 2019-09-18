@@ -21,6 +21,7 @@ class Server {
 
     this._io.on("connection", (socket) => {
       socket.server = this;
+      socket.io = this._io;
 
       ConnectionHandler(socket);
     });
