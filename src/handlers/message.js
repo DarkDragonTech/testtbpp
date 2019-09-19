@@ -13,6 +13,10 @@ module.exports = (socket, log, msg) => {
     	socket.server.motd.replace(/{HOST}/g, "//" + socket.handshake.headers.host + "/")
   	));
   } else {
-  	socket.io.emit("message", generateMessage(user, socket.server.users[socket.id].isGod(socket) ? msg : require("xss")(msg)));
+    if(socket.server.users[socket.id].isGod(socket)) {
+      socket.io.emit("message", generateMessage(user, msg));
+    } else {
+      socket.io.emit("message", generateMessage(user, require("xss")(msg)));
+    }
   }
 };
