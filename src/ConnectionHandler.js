@@ -9,7 +9,9 @@ function updateUserList(io, users) {
 }
 
 module.exports = function ConnectionHandler(socket) {
-  socket.server.onlog("socket - " + socket.id, "connection from " + socket.handshake.address);
+  let log = (msg) => socket.server.onlog("socket - " + socket.id, msg);
+
+  log("connection from " + socket.handshake.address);
 
   socket.on("user joined", (nick, color, style, password) => {
     let user = new User(socket, nick, color, style, password);
@@ -20,12 +22,15 @@ module.exports = function ConnectionHandler(socket) {
       socket.io.emit("user joined", user.getSafeObject());
     }
 
+    log("user joined")
+
     socket.server.users[socket.id] = user;
     updateUserList(socket.io, socket.server.users);
   });
 
   socket.on("disconnect", () => {
-    socket.server.onlog("socket - " + socket.id, "disconnected");
+    log("disconnected");
+
     if (!socket.server.users[socket.id]) return;
     let user = socket.server.users[socket.id];
     socket.io.emit("user left", user.getSafeObject());
@@ -33,9 +38,10 @@ module.exports = function ConnectionHandler(socket) {
     updateUserList(socket.io, socket.server.users);
   });
 
-
   // TODO: implement xss protection
   socket.on("message", msg => {
+    log(msg);
+
     if (!socket.server.users[socket.id]) return;
     console.log(msg);
     let user = socket.server.users[socket.id].getSafeObject();
