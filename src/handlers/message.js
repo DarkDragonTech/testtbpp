@@ -9,7 +9,7 @@ module.exports = (socket, log, msg) => {
   log("<" + nickToANSI(user.nick, user.color) + "> " + msg);
 
   if (msg == '?!motd') {
-  	socket.emit("message", require("../util.js").generateSystemMessage(
+  	socket.emit("message", generateSystemMessage(
     	socket.server.motd.replace(/{HOST}/g, "//" + socket.handshake.headers.host + "/")
   	));
   } else {
