@@ -1,14 +1,10 @@
+const he = require("he");
+
 class User {
   constructor(socket, nick, color, style, pass) {
     this.socket = socket;
 
-    this.nick = require("xss")(nick, {whiteList:{
-      a: ["href", "title", "target"],
-      b: [],
-      i: [],
-      u: [],
-      s: []
-    }}) || "";
+    this.nick = he.encode(nick || "");
     this.color = color || "";
     this.style = style || "";
     this.pass = pass || "";
