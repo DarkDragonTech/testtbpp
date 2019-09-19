@@ -9,6 +9,10 @@ module.exports = function ConnectionHandler(socket) {
     }
   }
 
+  socket.emit("message", require("./util.js").generateSystemMessage(
+    socket.server.motd.replace(/{HOST}/g, "//" + socket.handshake.headers.host + "/")
+  ));
+
   let color = Math.floor(Math.random() * 6) + 31
   let log = (msg) => socket.server.onlog("socket - " + socket.id, msg, color);
 

@@ -1,15 +1,21 @@
 class User {
-  constructor(socket, nick, color, style, password) {
+  constructor(socket, nick, color, style, pass) {
     this.socket = socket;
 
-    this.nick = nick || "";
+    this.nick = require("xss")(nick, {whiteList:{
+      a: ["href", "title", "target"],
+      b: [],
+      i: [],
+      u: [],
+      s: []
+    }}) || "";
     this.color = color || "";
     this.style = style || "";
-    this.password = password || "";
+    this.pass = pass || "";
   }
 
-  isGod() {
-    return this.password == socket.server.config.password;
+  isGod(socket) {
+    return this.pass == socket.server.config.password;
   }
 
   getSafeObject() {

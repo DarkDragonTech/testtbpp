@@ -8,5 +8,11 @@ module.exports = (socket, log, msg) => {
 
   log("<" + user.nick + "> " + msg);
 
-  socket.io.emit("message", generateMessage(user, msg));
+  if (msg == '?!motd') {
+  	socket.emit("message", require("../util.js").generateSystemMessage(
+    	socket.server.motd.replace(/{HOST}/g, "//" + socket.handshake.headers.host + "/")
+  	));
+  } else {
+  	socket.io.emit("message", generateMessage(user, socket.server.users[socket.id].isGod(socket) ? msg : require("xss")(msg)));
+  }
 };
