@@ -17,6 +17,7 @@
   },
   "homepage": "https://gitlab.com/1024x2/tbpp#readme",
   "dependencies": {
+    "color-rgba": "^2.1.1",
     "he": "^1.2.0",
     "socket.io": "^2.2.0"
   },
