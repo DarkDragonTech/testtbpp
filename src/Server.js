@@ -1,3 +1,4 @@
+const fs = require("fs");
 const io = require("socket.io");
 
 const ConnectionHandler = require("./ConnectionHandler.js");
@@ -16,6 +17,8 @@ class Server {
     this.port = config.port;
     this.password = config.password;
     this.config = config;
+
+    this.motd = fs.readFileSync(__dirname + "/../motd.txt", "utf-8").trim();
 
     this._io.on("connection", (socket) => {
       socket.server = this;

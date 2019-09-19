@@ -1,4 +1,5 @@
 const User = require("./User.js");
+const { generateMessage, generateSystemMessage } = require("./util.js");
 
 function updateUserList(io, users) {
   let result = {};
@@ -12,10 +13,8 @@ module.exports = function ConnectionHandler(socket) {
   let color = Math.floor(Math.random() * 6) + 31
   let log = (msg) => socket.server.onlog("socket - " + socket.id, msg, color);
 
-  log("connection from " + socket.handshake.address);
-
   socket.on("user joined", (nick, color, style, password) => {
-    log(nick + " joined");
+    log(nick + " joined (" + socket.handshake.address + ")");
 
     let user = new User(socket, nick, color, style, password);
 
@@ -25,15 +24,20 @@ module.exports = function ConnectionHandler(socket) {
       socket.io.emit("user joined", user.getSafeObject());
     }
 
+    socket.emit("message", generateSystemMessage(
+      socket.server.motd.replace(/{HOST}/g, "//" + socket.handshake.headers.host + "/")
+    ));
+
     socket.server.users[socket.id] = user;
     updateUserList(socket.io, socket.server.users);
   });
 
   socket.on("disconnect", () => {
-    log("disconnected");
-
     if (!socket.server.users[socket.id]) return;
     let user = socket.server.users[socket.id];
+
+    log(user.nick + " left");
+
     socket.io.emit("user left", user.getSafeObject());
     delete socket.server.users[socket.id];
     updateUserList(socket.io, socket.server.users);
@@ -41,17 +45,11 @@ module.exports = function ConnectionHandler(socket) {
 
   // TODO: implement xss protection
   socket.on("message", msg => {
-    log(msg);
-
     if (!socket.server.users[socket.id]) return;
-    console.log(msg);
     let user = socket.server.users[socket.id].getSafeObject();
-    socket.io.emit("message", {
-      date: Date.now(),
-      nick: user.nick,
-      color: user.color,
-      style: user.style,
-      msg: msg
-    });
+
+    log("<" + user.nick + "> " + msg);
+
+    socket.io.emit("message", generateMessage(user, msg));
   });
 }
