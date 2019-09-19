@@ -9,11 +9,14 @@ function updateUserList(io, users) {
 }
 
 module.exports = function ConnectionHandler(socket) {
-  let log = (msg) => socket.server.onlog("socket - " + socket.id, msg);
+  let color = Math.floor(Math.random() * 6) + 31
+  let log = (msg) => socket.server.onlog("socket - " + socket.id, msg, color);
 
   log("connection from " + socket.handshake.address);
 
   socket.on("user joined", (nick, color, style, password) => {
+    log(nick + " joined");
+
     let user = new User(socket, nick, color, style, password);
 
     if (socket.server.users[socket.id]) {
@@ -21,8 +24,6 @@ module.exports = function ConnectionHandler(socket) {
     } else {
       socket.io.emit("user joined", user.getSafeObject());
     }
-
-    log("user joined")
 
     socket.server.users[socket.id] = user;
     updateUserList(socket.io, socket.server.users);

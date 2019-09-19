@@ -13,8 +13,6 @@ class Server {
     this.users = {};
     this.onlog = () => {};
 
-    console.log(config);
-
     this.port = config.port;
     this.password = config.password;
     this.config = config;
