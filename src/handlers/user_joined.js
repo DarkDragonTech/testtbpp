@@ -5,11 +5,12 @@ module.exports = (socket, log, nick, color, style, password) => {
   let user = new User(socket, nick, color, style, password);
 
   if (socket.server.users[socket.id]) {
-    log(nickToANSI(socket.server.users[socket.id].nick, socket.server.users[socket.id].color) + " changed nick to " + nickToANSI(nick, color));
+    let oldUser = socket.server.users[socket.id];
+    log(nickToANSI(oldUser.nick, oldUser.color) + " changed nick to " + nickToANSI(nick, color));
 
-    socket.io.emit("user change nick", socket.server.users[socket.id].getSafeObject(), user.getSafeObject());
+    socket.io.emit("user change nick", oldUser.getSafeObject(), user.getSafeObject());
   } else {
-    log(nickToANSI(user.nick, user.color) + " joined (" + socket.handshake.address + ")");
+    log(nickToANSI(nick, color) + " joined (" + socket.handshake.address + ")");
 
     socket.io.emit("user joined", user.getSafeObject());
 
