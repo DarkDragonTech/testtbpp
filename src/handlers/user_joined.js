@@ -10,8 +10,8 @@ module.exports = (socket, log, nick, color, style, pass) => {
       .map(u => socket.server.users[u].nick)
   }
 
-  if (usernames.includes(nick)) {
-    socket.emit("message", generateSystemMessage("This nickname is already in use"));
+  if (usernames.includes(nick) || nick == "~") {
+    socket.emit("message", generateSystemMessage("This nickname is already in use."));
   } else {
     let user = new User(socket, nick, color, style, pass);
 
