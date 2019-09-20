@@ -22,9 +22,27 @@ module.exports = (socket, log, msg) => {
   if (!msg.startsWith("?!login ")) log("<" + user.nick + "> " + msg, true);
 
   if (msg.startsWith("?!")) {
-    if (commands[msg.slice(2).split(" ")[0]]) {
+    var command = commands[msg.slice(2).split(" ")[0]];
+    if (command) {
       var args = msg.split(" ").slice(1);
-      commands[msg.slice(2).split(" ")[0]](socket, log, ...args);
+
+      if (command.help.opOnly && !user.op) {
+        socket.emit("message", generateSystemMessage("This command is OP only. Did you forget to login?"));
+      }
+
+      command(socket, log, ...args);
+    } else if (msg.slice(2).split(" ")[0] == "help") {
+      var padding = Math.max(...(
+        Object.keys(commands)
+          .filter(s => !commands[s].help.hidden)
+          .map(s => s.length)
+      ));
+      var help = ["== COMMAND LIST =="];
+      for (var cmd in commands) {
+        if (commands[cmd].help.hidden) continue;
+        help.push("?!" + cmd.padEnd(padding) + " | " + (commands[cmd].help.description || "[ Description not found. ]"));
+      }
+      socket.emit("message", generateSystemMessage(help.join("\n")));
     } else {
       socket.emit("message", generateSystemMessage("Invalid command."));
     }
