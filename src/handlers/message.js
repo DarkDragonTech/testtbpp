@@ -34,13 +34,12 @@ module.exports = (socket, log, msg) => {
     } else if (msg.slice(2).split(" ")[0] == "help") {
       var padding = Math.max(...(
         Object.keys(commands)
-          .filter(s => !commands[s].help.hidden)
+          .filter(s => !commands[s].help.hidden && !(commands[s].help.opOnly && !user.op))
           .map(s => s.length)
       ));
       var help = ["== COMMAND LIST =="];
       for (var cmd in commands) {
-        if (commands[cmd].help.hidden) continue;
-        if (commands[cmd].help.opOnly && !user.op) continue;
+        if (commands[cmd].help.hidden || (commands[cmd].help.opOnly && !user.op)) continue;
         help.push("?!" + cmd.padEnd(padding) + " | " + (commands[cmd].help.description || "[ Description not found. ]"));
       }
       socket.emit("message", generateSystemMessage(help.join("\n")));
