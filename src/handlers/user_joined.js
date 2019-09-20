@@ -1,5 +1,6 @@
 const User = require("../User.js");
 const { generateSystemMessage, updateUserList } = require("../util.js");
+const seen = require("../commands/seen.js");
 
 module.exports = (socket, log, nick, color, style, pass) => {
   var usernames = [];
@@ -14,6 +15,8 @@ module.exports = (socket, log, nick, color, style, pass) => {
     socket.emit("message", generateSystemMessage("This nickname is already in use."));
   } else {
     let user = new User(socket, nick, color, style, pass);
+
+    seen.userSeen(nick);
 
     if (socket.server.users[socket.id]) {
       let oldUser = socket.server.users[socket.id];
