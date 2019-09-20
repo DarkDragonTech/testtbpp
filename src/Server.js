@@ -6,8 +6,6 @@ const HTTPServer = require("./HTTPServer.js");
 
 class Server {
   constructor(config) {
-    console.log(__dirname);
-
     this._http = new require("http").Server(HTTPServer(this));
     this._io = io(this._http);
 
@@ -15,7 +13,6 @@ class Server {
     this.onlog = () => {};
 
     this.port = config.port;
-    this.password = config.password;
     this.config = config;
 
     this.motd = fs.readFileSync(__dirname + "/../motd.txt", "utf-8").trim();

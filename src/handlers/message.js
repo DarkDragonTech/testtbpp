@@ -1,22 +1,38 @@
+const fs = require("fs");
 const User = require("../User.js");
-const { generateMessage, generateSystemMessage, nickToANSI } = require("../util.js");
+const { generateMessage, generateSystemMessage } = require("../util.js");
+
+// load commands
+var commands = {};
+
+for (var commandName of fs.readdirSync(__dirname + "/../commands/")) {
+  if (!commandName.endsWith(".js")) continue;
+
+  var command = require(__dirname + "/../commands/" + commandName);
+
+  commands[commandName.slice(0, -3)] = command;
+}
+
 
 // TODO: implement xss protection
 module.exports = (socket, log, msg) => {
   if (!socket.server.users[socket.id]) return;
-  let user = socket.server.users[socket.id].getSafeObject();
+  let user = socket.server.users[socket.id];
 
-  log("<" + nickToANSI(user.nick, user.color) + "> " + msg);
+  if (!msg.startsWith("?!login ")) log("<" + user.nick + "> " + msg, true);
 
-  if (msg == '?!motd') {
-  	socket.emit("message", generateSystemMessage(
-    	socket.server.motd.replace(/{HOST}/g, "//" + socket.handshake.headers.host + "/")
-  	));
-  } else {
-    if(socket.server.users[socket.id].isGod(socket)) {
-      socket.io.emit("message", generateMessage(user, msg));
+  if (msg.startsWith("?!")) {
+    if (commands[msg.slice(2).split(" ")[0]]) {
+      var args = msg.split(" ").slice(1);
+      commands[msg.slice(2).split(" ")[0]](socket, log, ...args);
     } else {
-      socket.io.emit("message", generateMessage(user, require("xss")(msg)));
+      socket.emit("message", generateSystemMessage("Invalid command."));
+    }
+  } else {
+    if (socket.server.users[socket.id].op) {
+      socket.io.emit("message", generateMessage(user.getSafeObject(), msg));
+    } else {
+      socket.io.emit("message", generateMessage(user.getSafeObject(), require("xss")(msg)));
     }
   }
 };

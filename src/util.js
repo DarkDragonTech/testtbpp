@@ -27,10 +27,5 @@ module.exports = {
       result[user] = users[user].getSafeObject();
     }
     io.emit("update users", result);
-  },
-  nickToANSI(nick, color) {
-    let [r, g, b] = rgba(color);
-
-    return "\x1b[38;2;" + r + ";" + g + ";" + b + "m" + nick + "\x1b[0m"
   }
 };

@@ -14,7 +14,7 @@ module.exports = function ConnectionHandler(socket) {
   ));
 
   let color = Math.floor(Math.random() * 6) + 31
-  let log = (msg) => socket.server.onlog("socket - " + socket.id, msg, color);
+  let log = (msg, verbose) => socket.server.onlog("socket - " + socket.id, msg, color, verbose || false);
 
   socket.on("user joined", loadHandler(user_joined));
   socket.on("disconnect", loadHandler(disconnect));

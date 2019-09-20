@@ -1,5 +1,6 @@
 {
   "port": 8081,
   "noSameName": true,
-  "password": "changeme"
+  "password": "changeme",
+  "verbose": false
 }

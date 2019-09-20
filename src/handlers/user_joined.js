@@ -1,29 +1,29 @@
 const User = require("../User.js");
-const { generateSystemMessage, updateUserList, nickToANSI } = require("../util.js");
+const { generateSystemMessage, updateUserList } = require("../util.js");
 
 module.exports = (socket, log, nick, color, style, pass) => {
   var usernames = [];
-  if (require("../../config.json").noSameName) {
-    for (var a in socket.server.users) {
-      usernames.push(socket.server.users[a].nick);
-    };
+
+  if (socket.server.config.noSameName) {
+    usernames = Object.keys(socket.server.users)
+      .filter(u => socket.server.users[u].socket.id != socket.id)
+      .map(u => socket.server.users[u].nick)
   }
 
-  if (!usernames.includes(nick)) {
-    log(nick + " joined (" + socket.handshake.address + ")");
+  if (usernames.includes(nick)) {
+    socket.emit("message", generateSystemMessage("This nickname is already in use"));
+  } else {
     let user = new User(socket, nick, color, style, pass);
 
     if (socket.server.users[socket.id]) {
       let oldUser = socket.server.users[socket.id];
-      log(nickToANSI(oldUser.nick, oldUser.color) + " changed nick to " + nickToANSI(nick, color));
+      log(oldUser.nick + " changed nick to " + user.nick, true);
       socket.io.emit("user change nick", oldUser.getSafeObject(), user.getSafeObject());
     } else {
-       log(nickToANSI(nick, color) + " joined (" + socket.handshake.address + ")");
+       log(user.nick + " joined (" + socket.handshake.address + ")", true);
       socket.io.emit("user joined", user.getSafeObject());
     }
     socket.server.users[socket.id] = user;
-  } else {
-    socket.emit("message", generateSystemMessage(`The username "${nick}" is already being used.`));
-  };
-  updateUserList(socket.io, socket.server.users);
+    updateUserList(socket.io, socket.server.users);
+  }
 }

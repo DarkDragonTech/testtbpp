@@ -1,25 +1,13 @@
+const { generateSystemMessage } = require("./util.js");
 const he = require("he");
 
 // Thanks to ziad87 for this function
 function colorAlgo(name) {
-  const COLORS = [
-    "#e21400",
-    "#f78b00",
-    "#f8a700",
-    "#f78b00",
-    "#58dc00",
-    "#c3ff00",
-    "#a8f07a",
-    "#4ae8c4",
-    "#3b88eb",
-    "#ff00ff",
-    "#a700ff",
-    "#d300e7"
-  ];
+  const COLORS = ["#e21400", "#f78b00", "#f8a700", "#f78b00", "#58dc00", "#c3ff00", "#a8f07a", "#4ae8c4", "#3b88eb", "#ff00ff", "#a700ff", "#d300e7"];
 
   let hash = 7;
   for (let i = 0; i < name.length; i++) {
-    hash = n.charCodeAt(i) + (hash<<5) - hash;
+    hash = name.charCodeAt(i) + (hash<<5) - hash;
   }
   return COLORS[Math.abs(hash % COLORS.length)];
 }
@@ -32,10 +20,8 @@ class User {
     this.color = color || colorAlgo(this.nick);
     this.style = style || "";
     this.pass = pass || "";
-  }
 
-  isGod(socket) {
-    return this.pass == socket.server.config.password;
+    this.op = this.pass == socket.server.config.password;
   }
 
   getSafeObject() {
