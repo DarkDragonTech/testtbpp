@@ -28,9 +28,9 @@ module.exports = (socket, log, msg) => {
 
       if (command.help.opOnly && !user.op) {
         socket.emit("message", generateSystemMessage("This command is OP only. Did you forget to login?"));
+      } else {
+        command(socket, log, ...args);
       }
-
-      command(socket, log, ...args);
     } else if (msg.slice(2).split(" ")[0] == "help") {
       var padding = Math.max(...(
         Object.keys(commands)
@@ -40,6 +40,7 @@ module.exports = (socket, log, msg) => {
       var help = ["== COMMAND LIST =="];
       for (var cmd in commands) {
         if (commands[cmd].help.hidden) continue;
+        if (commands[cmd].help.opOnly && !user.op) continue;
         help.push("?!" + cmd.padEnd(padding) + " | " + (commands[cmd].help.description || "[ Description not found. ]"));
       }
       socket.emit("message", generateSystemMessage(help.join("\n")));
