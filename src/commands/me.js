@@ -12,5 +12,5 @@ module.exports = (socket, log, ...msg) => {
 };
 
 module.exports.help = {
-  description: "Prints a message in the format of \"~ <nick> <message>. \"."
+  description: "Prints a message in the format of '~ &lt;your nick&gt; &lt;message&gt;'."
 };
