@@ -61,5 +61,4 @@ typings/
 .next
 
 
-config.ini
-bans.json
+config.json
