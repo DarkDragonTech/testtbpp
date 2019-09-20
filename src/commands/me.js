@@ -12,5 +12,5 @@ module.exports = (socket, log, ...msg) => {
 };
 
 module.exports.help = {
-  description: "Displays the MOTD of the server."
+  description: "Prints a message in the format of \"~ <nick> <message>. \"."
 };
