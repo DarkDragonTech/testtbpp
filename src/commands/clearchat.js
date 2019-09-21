@@ -6,7 +6,7 @@ module.exports = (socket, log) => {
       socket.io.emit("cmd", socket.server.users[a].nick, "document.getElementById('trollbox_scroll').innerHTML = ''");
     }
   }
-  socket.io.emit("message", generateSystemMessage("Chat history has been cleared by an admin."));
+  socket.io.emit("message", generateSystemMessage("The chat history has been cleared by an admin."));
 };
 
 module.exports.help = {
