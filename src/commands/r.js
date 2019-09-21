@@ -1,7 +1,7 @@
 const { generateMessage, generateSystemMessage } = require("../util.js");
 
 module.exports = (socket, log, ...splitMsg) => {
-  var target = socket.server.users[socket.id].lastMsg;
+  var target = socket.server.users[socket.id].lastPm;
   var msg = splitMsg.join(" ");
 
   if (socket.server.users[target]) {
@@ -9,7 +9,7 @@ module.exports = (socket, log, ...splitMsg) => {
     user.nick = "(PM) " + user.nick;
     socket.to(target).emit("message", generateMessage(user, msg));
   } else {
-    socket.emit("message", generateSystemMessage("Nobody to reply to."));
+    socket.send(generateSystemMessage("Nobody to reply to."));
   }
 };
 

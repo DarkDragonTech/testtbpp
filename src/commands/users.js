@@ -5,7 +5,7 @@ module.exports = (socket, log) => {
   for (var a in socket.server.users) {
     users.push(`<b>${socket.server.users[a].nick}</b> - ${a}`);
   }
-  socket.emit("message", generateSystemMessage(users.join("\n")));
+  socket.send(generateSystemMessage(users.join("\n")));
 };
 
 module.exports.help = {

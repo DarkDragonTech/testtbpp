@@ -23,7 +23,10 @@ class User {
 
     this.op = this.pass == socket.server.config.password;
 
+    this.lastPm = null;
+
     this.lastMsg = null;
+    this.lastMsgDate = 0;
   }
 
   getSafeObject() {

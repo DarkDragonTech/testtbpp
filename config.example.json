@@ -2,5 +2,6 @@
   "port": 8081,
   "noSameName": true,
   "password": "changeme",
-  "verbose": false
+  "verbose": false,
+  "ratelimit": 1000
 }

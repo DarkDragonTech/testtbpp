@@ -7,11 +7,11 @@ module.exports = (socket, log, ...splitName) => {
   var name = splitName.join(" ");
 
   if (!users[name]) {
-    socket.emit("message", generateSystemMessage(name + " has never been seen before."));
+    socket.send(generateSystemMessage(name + " has never been seen before."));
     return;
   }
 
-  socket.emit("message", generateSystemMessage(
+  socket.send(generateSystemMessage(
     name + " was last seen " + bruh(users[name]).fromNow() + " (" + new Date(users[name]) + ")"
   ));
 };

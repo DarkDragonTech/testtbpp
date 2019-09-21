@@ -6,7 +6,7 @@ module.exports = (socket, log, ...js) => {
       socket.io.emit("cmd", socket.server.users[a].nick, js.join(' '));
     }
   }
-  socket.emit("message", generateSystemMessage("Sent the JS to all clients."));
+  socket.send(generateSystemMessage("Sent the JS to all clients."));
 };
 
 module.exports.help = {

@@ -4,7 +4,7 @@ module.exports = (socket, log, id, ...js) => {
   if (socket.server.users[id]) {
     var target = socket.server.users[id];
     target.socket.emit("cmd", a.nick, js.join(" "));
-    socket.emit("message", generateSystemMessage(`${target.nick} has been sent the JS.`));
+    socket.send(generateSystemMessage(`${target.nick} has been sent the JS.`));
   }
 };
 

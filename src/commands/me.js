@@ -2,7 +2,7 @@ const he = require("he");
 
 module.exports = (socket, log, ...msg) => {
   var user = socket.server.users[socket.id];
-  socket.emit("message", {
+  socket.send({
     date: Date.now(),
     nick: "~",
     color: "#af519b",

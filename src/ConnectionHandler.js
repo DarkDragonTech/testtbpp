@@ -9,7 +9,7 @@ module.exports = function ConnectionHandler(socket) {
     }
   }
 
-  socket.emit("message", require("./util.js").generateSystemMessage(
+  socket.send(require("./util.js").generateSystemMessage(
     socket.server.motd.replace(/{HOST}/g, "//" + socket.handshake.headers.host + "/")
   ));
 

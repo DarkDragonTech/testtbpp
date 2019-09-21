@@ -1,4 +1,6 @@
 const fs = require("fs");
+const he = require("he");
+
 const User = require("../User.js");
 const { generateMessage, generateSystemMessage } = require("../util.js");
 
@@ -19,38 +21,41 @@ module.exports = (socket, log, msg) => {
   if (!socket.server.users[socket.id]) return;
   let user = socket.server.users[socket.id];
 
+  if (!user.op) {
+    if (user.lastMsg == msg || user.lastMsgDate + 2000 > Date.now()) {
+      return;
+    }
+  }
+
+
   if (!msg.startsWith("?!login ")) log("<" + user.nick + "> " + msg, true);
 
   if (msg.startsWith("?!")) {
-    var command = commands[msg.slice(2).split(" ")[0]];
+    var commandName = msg.slice(2).split(" ")[0];
+    var command = commands[commandName];
+
     if (command) {
       var args = msg.split(" ").slice(1);
 
+      // hacky solution
+      if (commandName == "help") args = [commands];
+
       if (command.help.opOnly && !user.op) {
-        socket.emit("message", generateSystemMessage("This command is OP only. Did you forget to login?"));
+        socket.send(generateSystemMessage("This command is OP only. Did you forget to login?"));
       } else {
         command(socket, log, ...args);
       }
-    } else if (msg.slice(2).split(" ")[0] == "help") {
-      var padding = Math.max(...(
-        Object.keys(commands)
-          .filter(s => !commands[s].help.hidden && !(commands[s].help.opOnly && !user.op))
-          .map(s => s.length)
-      ));
-      var help = ["== COMMAND LIST =="];
-      for (var cmd in commands) {
-        if (commands[cmd].help.hidden || (commands[cmd].help.opOnly && !user.op)) continue;
-        help.push("?!" + cmd.padEnd(padding) + " | " + (commands[cmd].help.description || "[ Description not found. ]"));
-      }
-      socket.emit("message", generateSystemMessage(help.join("\n")));
     } else {
-      socket.emit("message", generateSystemMessage("Invalid command."));
+      socket.send(generateSystemMessage("Invalid command."))
     }
   } else {
-    if (socket.server.users[socket.id].op) {
+    if (user.op) {
       socket.io.emit("message", generateMessage(user.getSafeObject(), msg));
     } else {
-      socket.io.emit("message", generateMessage(user.getSafeObject(), require("xss")(msg)));
+      user.lastMsg = msg;
+      user.lastMsgDate = Date.now();
+
+      socket.io.emit("message", generateMessage(user.getSafeObject(), he.encode(msg)));
     }
   }
 };

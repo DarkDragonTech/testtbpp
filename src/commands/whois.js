@@ -8,7 +8,7 @@ module.exports = (socket, log, ...splitName) => {
     .map(user => socket.server.users[user]);
 
   for (let result of results) {
-    socket.emit("message", generateSystemMessage(`== INFO FOR ${result.socket.id} ==
+    socket.send(generateSystemMessage(`== INFO FOR ${result.socket.id} ==
 Socket ID  : ${result.socket.id}
 IP Address : ${result.socket.handshake.address}
 Nickname   : ${JSON.stringify(result.nick)}
