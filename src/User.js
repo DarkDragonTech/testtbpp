@@ -22,6 +22,8 @@ class User {
     this.pass = pass || "";
 
     this.op = this.pass == socket.server.config.password;
+
+    this.lastMsg = null;
   }
 
   getSafeObject() {
