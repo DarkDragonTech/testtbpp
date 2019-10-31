@@ -3,5 +3,6 @@
   "noSameName": true,
   "password": "changeme",
   "verbose": false,
-  "ratelimit": 1000
+  "ratelimit": 1000,
+  "prefix": "//"
 }

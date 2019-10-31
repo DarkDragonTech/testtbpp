@@ -11,6 +11,7 @@ module.exports = function ConnectionHandler(socket) {
 
   socket.send(require("./util.js").generateSystemMessage(
     socket.server.motd.replace(/{HOST}/g, "//" + socket.handshake.headers.host + "/")
+    .replace(/{PREFIX}/g, socket.server.config.prefix)
   ));
 
   let color = Math.floor(Math.random() * 6) + 31

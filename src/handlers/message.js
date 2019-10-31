@@ -28,9 +28,9 @@ module.exports = (socket, log, msg) => {
   }
 
 
-  if (!msg.startsWith("?!login ")) log("<" + user.nick + "> " + msg, true);
+  if (!msg.startsWith(socket.server.config.prefix + "login ")) log("<" + user.nick + "> " + msg, true);
 
-  if (msg.startsWith("?!")) {
+  if (msg.startsWith(socket.server.config.prefix)) {
     var commandName = msg.slice(2).split(" ")[0];
     var command = commands[commandName];
 

@@ -12,7 +12,7 @@ module.exports = (socket, log, commands) => {
   var help = ["== COMMAND LIST =="];
   for (var cmd in commands) {
     if (commands[cmd].help.hidden || (commands[cmd].help.opOnly && !user.op)) continue;
-    help.push("?!" + cmd.padEnd(padding) + " | " + (commands[cmd].help.description || "[ Description not found. ]"));
+    help.push(socket.server.config.prefix + cmd.padEnd(padding) + " | " + (commands[cmd].help.description || "[ Description not found. ]"));
   }
   socket.send(generateSystemMessage(help.join("\n")));
 };
