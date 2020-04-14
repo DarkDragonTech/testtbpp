@@ -18,11 +18,13 @@
   "homepage": "https://gitlab.com/1024x2/tbpp#readme",
   "dependencies": {
     "color-rgba": "^2.1.1",
+    "express": "^4.17.1",
     "he": "^1.2.0",
-    "mariadb": "^2.1.1",
     "moment": "^2.24.0",
     "socket.io": "^2.2.0",
     "xss": "^1.0.6"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^6.8.0"
+  }
 }
