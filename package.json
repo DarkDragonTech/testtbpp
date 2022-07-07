@@ -23,7 +23,7 @@
     "is-color": "^1.0.2",
     "lowdb": "^1.0.0",
     "mime-types": "^2.1.20",
-    "moment": "^2.22.2",
+    "moment": "^2.29.4",
     "socket.io": "^2.1.1",
     "string-to-color": "^2.0.0",
     "supports-color": "^5.5.0",
